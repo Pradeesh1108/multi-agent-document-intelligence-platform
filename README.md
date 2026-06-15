@@ -49,36 +49,25 @@ Ticket Created in CRM / Sales Team Notified
 The core of the system is a 7-node autonomous agent pipeline built on **LangGraph**. Each agent has a specific, isolated responsibility.
 
 ```mermaid
-flowchart TD
-    %% Nodes
-    In([Incoming Document])
-    Intake(Intake Agent)
----
-config:
-  flowchart:
-    curve: linear
----
 graph TD;
-	__start__([<p>__start__</p>]):::first
-	intake(intake)
-	intent(intent)
-	extraction(extraction)
-	knowledge(knowledge)
-	risk(risk)
-	decision(decision)
-	action(action)
-	__end__([<p>__end__</p>]):::last
-	__start__ --> intake;
-	decision --> action;
-	extraction --> knowledge;
-	intake --> intent;
-	intent --> extraction;
-	knowledge --> risk;
-	risk --> decision;
-	action --> __end__;
-	classDef default fill:#f2f0ff,line-height:1.2
-	classDef first fill-opacity:0
-	classDef last fill:#bfb6fc
+    __start__([Start])
+    intake(Intake Agent)
+    intent(Intent Agent)
+    extraction(Extraction Agent)
+    knowledge(Knowledge Agent)
+    risk(Risk Agent)
+    decision(Decision Agent)
+    action(Action Agent)
+    __end__([End])
+    
+    __start__ --> intake;
+    intake --> intent;
+    intent --> extraction;
+    extraction --> knowledge;
+    knowledge --> risk;
+    risk --> decision;
+    decision --> action;
+    action --> __end__;
 ```
 
 ### Agent Responsibilities
