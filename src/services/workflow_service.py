@@ -45,6 +45,7 @@ class WorkflowService:
         self,
         raw_text: str,
         llm_provider: str | None = None,
+        api_key: str | None = None,
         filename: str | None = None,
     ) -> WorkflowResult:
         """
@@ -85,6 +86,7 @@ class WorkflowService:
             },
             "errors": [],
             "llm_provider": llm_provider,
+            "api_key": api_key,
         }
 
         # Track in store
@@ -130,6 +132,7 @@ class WorkflowService:
         file_path: str,
         filename: str,
         llm_provider: str | None = None,
+        api_key: str | None = None,
     ) -> WorkflowResult:
         """
         Process an uploaded file through the workflow.
@@ -150,7 +153,7 @@ class WorkflowService:
             with open(file_path, "r", encoding="utf-8") as f:
                 raw_text = f.read()
 
-        return await self.process_text(raw_text, llm_provider, filename)
+        return await self.process_text(raw_text, llm_provider, api_key, filename)
 
     def get_workflow_status(self, workflow_id: str) -> dict[str, Any] | None:
         """

@@ -53,23 +53,32 @@ flowchart TD
     %% Nodes
     In([Incoming Document])
     Intake(Intake Agent)
-    Intent(Intent Agent)
-    Extract(Extraction Agent)
-    Knowledge(Knowledge Agent)
-    Risk(Risk Agent)
-    Decision(Decision Agent)
-    Action(Action Agent)
-    Out([Workflow Complete])
-
-    %% Edge Connections
-    In --> Intake
-    Intake -- Clean/Normalize --> Intent
-    Intent -- Classify --> Extract
-    Extract -- Structured Schema --> Knowledge
-    Knowledge -- RAG Context --> Risk
-    Risk -- Risk Factors --> Decision
-    Decision -- Recommended Action --> Action
-    Action -- Execute via CRM/Email --> Out
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	intake(intake)
+	intent(intent)
+	extraction(extraction)
+	knowledge(knowledge)
+	risk(risk)
+	decision(decision)
+	action(action)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> intake;
+	decision --> action;
+	extraction --> knowledge;
+	intake --> intent;
+	intent --> extraction;
+	knowledge --> risk;
+	risk --> decision;
+	action --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
 ```
 
 ### Agent Responsibilities

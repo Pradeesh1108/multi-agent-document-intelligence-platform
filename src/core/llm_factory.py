@@ -36,6 +36,7 @@ class LLMFactory:
     @staticmethod
     def create(
         provider: str | None = None,
+        api_key: str | None = None,
         temperature: float = 0.3,
         max_tokens: int = 4096,
     ) -> BaseChatModel:
@@ -58,9 +59,9 @@ class LLMFactory:
         resolved_provider = LLMProvider(provider) if provider else settings.LLM_PROVIDER
 
         if resolved_provider == LLMProvider.GEMINI:
-            return LLMFactory._create_gemini(temperature, max_tokens)
+            return LLMFactory._create_gemini(temperature, max_tokens, api_key)
         elif resolved_provider == LLMProvider.GROQ:
-            return LLMFactory._create_groq(temperature, max_tokens)
+            return LLMFactory._create_groq(temperature, max_tokens, api_key)
         else:
             raise ValueError(
                 f"Unknown LLM provider: '{resolved_provider}'. "
@@ -68,41 +69,43 @@ class LLMFactory:
             )
 
     @staticmethod
-    def _create_gemini(temperature: float, max_tokens: int) -> BaseChatModel:
+    def _create_gemini(temperature: float, max_tokens: int, api_key: str | None) -> BaseChatModel:
         """Create a Google Gemini chat model instance."""
         from langchain_google_genai import ChatGoogleGenerativeAI
 
         settings = get_settings()
-        if not settings.GOOGLE_API_KEY:
+        key_to_use = api_key or settings.GOOGLE_API_KEY
+        if not key_to_use:
             raise ValueError(
                 "GOOGLE_API_KEY is required for the Gemini provider. "
-                "Set it in your .env file."
+                "Set it in your .env file or provide it via the UI."
             )
 
         logger.info(f"Creating Gemini LLM instance: model={settings.GEMINI_MODEL}")
         return ChatGoogleGenerativeAI(
             model=settings.GEMINI_MODEL,
-            google_api_key=settings.GOOGLE_API_KEY,
+            google_api_key=key_to_use,
             temperature=temperature,
             max_output_tokens=max_tokens,
         )
 
     @staticmethod
-    def _create_groq(temperature: float, max_tokens: int) -> BaseChatModel:
+    def _create_groq(temperature: float, max_tokens: int, api_key: str | None) -> BaseChatModel:
         """Create a Groq chat model instance."""
         from langchain_groq import ChatGroq
 
         settings = get_settings()
-        if not settings.GROQ_API_KEY:
+        key_to_use = api_key or settings.GROQ_API_KEY
+        if not key_to_use:
             raise ValueError(
                 "GROQ_API_KEY is required for the Groq provider. "
-                "Set it in your .env file."
+                "Set it in your .env file or provide it via the UI."
             )
 
         logger.info(f"Creating Groq LLM instance: model={settings.GROQ_MODEL}")
         return ChatGroq(
             model=settings.GROQ_MODEL,
-            api_key=settings.GROQ_API_KEY,
+            api_key=key_to_use,
             temperature=temperature,
             max_tokens=max_tokens,
         )

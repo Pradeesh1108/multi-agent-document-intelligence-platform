@@ -33,6 +33,7 @@ async def process_document(
     file: UploadFile = File(None),
     raw_text_input: Optional[str] = Form(None),
     llm_provider: Optional[str] = Form(None),
+    api_key: Optional[str] = Form(None),
 ) -> WorkflowResult:
     """
     Process a document through the multi-agent workflow.
@@ -43,9 +44,9 @@ async def process_document(
     service = get_workflow_service()
 
     if file and file.filename:
-        return await _process_file(service, file, llm_provider)
+        return await _process_file(service, file, llm_provider, api_key)
     elif raw_text_input:
-        return await _process_text(service, raw_text_input, llm_provider)
+        return await _process_text(service, raw_text_input, llm_provider, api_key)
     else:
         raise HTTPException(
             status_code=400,
@@ -57,6 +58,7 @@ async def process_document(
 async def upload_document(
     file: UploadFile = File(...),
     llm_provider: Optional[str] = Form(None),
+    api_key: Optional[str] = Form(None),
 ) -> WorkflowResult:
     """
     Upload and process a document file.
@@ -64,13 +66,14 @@ async def upload_document(
     Supported formats: .pdf, .json, .txt, .eml
     """
     service = get_workflow_service()
-    return await _process_file(service, file, llm_provider)
+    return await _process_file(service, file, llm_provider, api_key)
 
 
 async def _process_file(
     service: WorkflowService,
     file: UploadFile,
     llm_provider: str | None,
+    api_key: str | None,
 ) -> WorkflowResult:
     """Handle file upload processing."""
     settings = get_settings()
@@ -92,7 +95,7 @@ async def _process_file(
         logger.info(f"File saved temporarily: {file_path}")
 
         # Process
-        result = await service.process_file(file_path, filename, llm_provider)
+        result = await service.process_file(file_path, filename, llm_provider, api_key)
         return result
 
     finally:
@@ -106,6 +109,7 @@ async def _process_text(
     service: WorkflowService,
     raw_text: str,
     llm_provider: str | None,
+    api_key: str | None,
 ) -> WorkflowResult:
     """Handle raw text processing."""
     if not raw_text.strip():
@@ -115,4 +119,4 @@ async def _process_text(
         )
 
     logger.info(f"Processing raw text input ({len(raw_text)} chars)")
-    return await service.process_text(raw_text, llm_provider)
+    return await service.process_text(raw_text, llm_provider, api_key)

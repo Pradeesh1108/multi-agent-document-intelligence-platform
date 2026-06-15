@@ -22,6 +22,19 @@ from src.graph.state import WorkflowState
 logger = get_logger(__name__)
 
 
+def _clean_error(e: Exception) -> str:
+    """Clean up verbose LLM API errors for the UI."""
+    msg = str(e)
+    if "API_KEY_INVALID" in msg or "API key not valid" in msg or "401" in msg or "authentication" in msg.lower():
+        raise ValueError("Invalid API key provided. Please check your credentials.")
+    if "Invalid API key provided" in msg:
+        raise ValueError("Invalid API key provided. Please check your credentials.")
+    # Truncate very long errors
+    if len(msg) > 200:
+        return msg[:197] + "..."
+    return msg
+
+
 def intake_node(state: WorkflowState) -> dict:
     """
     Intake Node — Normalize and validate the incoming document.
@@ -63,14 +76,16 @@ def intent_node(state: WorkflowState) -> dict:
             normalized_content=state["normalized_content"],
             file_type=state["file_type"],
             llm_provider=state.get("llm_provider"),
+            api_key=state.get("api_key"),
         )
         return {"intent": result}
     except Exception as e:
+        clean_err = _clean_error(e)
         logger.error(f"Intent node failed: {e}")
         errors = list(state.get("errors", []))
-        errors.append(f"Intent classification failed: {e}")
+        errors.append(f"Intent classification failed: {clean_err}")
         return {
-            "intent": {"intent": "other", "confidence": 0.0, "reasoning": str(e)},
+            "intent": {"intent": "other", "confidence": 0.0, "reasoning": clean_err},
             "errors": errors,
         }
 
@@ -95,16 +110,18 @@ def extraction_node(state: WorkflowState) -> dict:
             intent=intent_value,
             file_type=state["file_type"],
             llm_provider=state.get("llm_provider"),
+            api_key=state.get("api_key"),
         )
         return {"extracted_entities": result}
     except Exception as e:
+        clean_err = _clean_error(e)
         logger.error(f"Extraction node failed: {e}")
         errors = list(state.get("errors", []))
-        errors.append(f"Entity extraction failed: {e}")
+        errors.append(f"Entity extraction failed: {clean_err}")
         return {
             "extracted_entities": {
                 "entity_type": intent_value,
-                "entities": {"error": str(e)},
+                "entities": {"error": clean_err},
                 "confidence": 0.0,
             },
             "errors": errors,
@@ -150,19 +167,21 @@ def risk_node(state: WorkflowState) -> dict:
             extracted_entities=state.get("extracted_entities"),
             retrieved_context=state.get("retrieved_context", []),
             llm_provider=state.get("llm_provider"),
+            api_key=state.get("api_key"),
         )
         return {"risk_analysis": result}
     except Exception as e:
+        clean_err = _clean_error(e)
         logger.error(f"Risk node failed: {e}")
         errors = list(state.get("errors", []))
-        errors.append(f"Risk analysis failed: {e}")
+        errors.append(f"Risk analysis failed: {clean_err}")
         return {
             "risk_analysis": {
                 "risk_score": 0.5,
                 "risk_level": "medium",
-                "risk_factors": [str(e)],
+                "risk_factors": [clean_err],
                 "recommended_action": "Manual review",
-                "explanation": f"Risk analysis error: {e}",
+                "explanation": f"Risk analysis error: {clean_err}",
             },
             "errors": errors,
         }
@@ -185,17 +204,19 @@ def decision_node(state: WorkflowState) -> dict:
             retrieved_context=state.get("retrieved_context", []),
             risk_analysis=state.get("risk_analysis"),
             llm_provider=state.get("llm_provider"),
+            api_key=state.get("api_key"),
         )
         return {"decision": result}
     except Exception as e:
+        clean_err = _clean_error(e)
         logger.error(f"Decision node failed: {e}")
         errors = list(state.get("errors", []))
-        errors.append(f"Decision making failed: {e}")
+        errors.append(f"Decision making failed: {clean_err}")
         return {
             "decision": {
                 "decision": "flag_for_manual_review",
                 "confidence": 0.0,
-                "reasoning": f"Decision error: {e}",
+                "reasoning": f"Decision error: {clean_err}",
                 "priority": "medium",
             },
             "errors": errors,
@@ -222,14 +243,15 @@ def action_node(state: WorkflowState) -> dict:
         )
         return {"actions": result.get("actions", [])}
     except Exception as e:
+        clean_err = _clean_error(e)
         logger.error(f"Action node failed: {e}")
         errors = list(state.get("errors", []))
-        errors.append(f"Action execution failed: {e}")
+        errors.append(f"Action execution failed: {clean_err}")
         return {
             "actions": [{
                 "action_type": "error",
                 "status": "failed",
-                "details": {"error": str(e)},
+                "details": {"error": clean_err},
                 "timestamp": "",
             }],
             "errors": errors,

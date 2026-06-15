@@ -11,6 +11,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 
 from src.core.llm_factory import LLMFactory
 from src.core.logging import get_logger
+from src.core.utils import clean_llm_error
 from src.schemas.agent_outputs import RiskAnalysis
 
 logger = get_logger(__name__)
@@ -72,6 +73,7 @@ class RiskAgent:
         extracted_entities: dict | None,
         retrieved_context: list[str],
         llm_provider: str | None = None,
+        api_key: str | None = None,
     ) -> dict:
         """
         Analyze document risk.
@@ -89,7 +91,7 @@ class RiskAgent:
         logger.info("[RiskAgent] Performing risk analysis")
 
         try:
-            llm = LLMFactory.create(provider=llm_provider, temperature=0.1)
+            llm = LLMFactory.create(provider=llm_provider, api_key=api_key, temperature=0.2)
             structured_llm = llm.with_structured_output(RiskAnalysis)
 
             # Build context for risk analysis
@@ -133,11 +135,12 @@ class RiskAgent:
             return result.model_dump()
 
         except Exception as e:
+            clean_err = clean_llm_error(e)
             logger.error(f"[RiskAgent] Risk analysis failed: {e}")
             return RiskAnalysis(
                 risk_score=0.5,
                 risk_level="medium",
-                risk_factors=[f"Risk analysis error: {e}"],
-                recommended_action="Manual review recommended due to analysis failure",
-                explanation=f"Risk analysis could not be completed: {e}",
+                risk_factors=[clean_err],
+                recommended_action="Manual review",
+                explanation=clean_err,
             ).model_dump()

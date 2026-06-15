@@ -11,6 +11,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 
 from src.core.llm_factory import LLMFactory
 from src.core.logging import get_logger
+from src.core.utils import clean_llm_error
 from src.schemas.agent_outputs import WorkflowDecision
 
 logger = get_logger(__name__)
@@ -59,6 +60,7 @@ class DecisionAgent:
         retrieved_context: list[str],
         risk_analysis: dict | None,
         llm_provider: str | None = None,
+        api_key: str | None = None,
     ) -> dict:
         """
         Make a workflow decision based on all accumulated data.
@@ -76,7 +78,7 @@ class DecisionAgent:
         logger.info("[DecisionAgent] Making workflow decision")
 
         try:
-            llm = LLMFactory.create(provider=llm_provider, temperature=0.2)
+            llm = LLMFactory.create(provider=llm_provider, api_key=api_key, temperature=0.1)
             structured_llm = llm.with_structured_output(WorkflowDecision)
 
             # Build comprehensive context
@@ -102,11 +104,12 @@ class DecisionAgent:
             return result.model_dump()
 
         except Exception as e:
-            logger.error(f"[DecisionAgent] Decision failed: {e}")
+            clean_err = clean_llm_error(e)
+            logger.error(f"[DecisionAgent] Decision making failed: {e}")
             return WorkflowDecision(
                 decision="flag_for_manual_review",
                 confidence=0.0,
-                reasoning=f"Automated decision failed: {e}. Manual review required.",
+                reasoning=clean_err,
                 priority="medium",
             ).model_dump()
 

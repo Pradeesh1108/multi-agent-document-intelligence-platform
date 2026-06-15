@@ -130,6 +130,7 @@ async function handleSubmit() {
     const resultsSection = document.getElementById('resultsSection');
     const resultsContent = document.getElementById('resultsContent');
     const provider = document.getElementById('providerSelect').value;
+    const apiKey = document.getElementById('apiKeyInput').value.trim();
 
     let hasInput = false;
     const formData = new FormData();
@@ -150,8 +151,16 @@ async function handleSubmit() {
         return;
     }
 
+    if (apiKey && !provider) {
+        alert('Please select an LLM Provider (Gemini or Groq) when providing a custom API Key.');
+        return;
+    }
+
     if (provider) {
         formData.append('llm_provider', provider);
+    }
+    if (apiKey) {
+        formData.append('api_key', apiKey);
     }
 
     // Set Loading State
@@ -191,6 +200,18 @@ function renderResults(data) {
 
     // 1. High Level Summary Grid
     container.appendChild(renderSummaryGrid(data));
+
+    // If the workflow failed completely (e.g. invalid API key), just show the errors and stop.
+    if (data.status === 'failed') {
+        if (data.errors && data.errors.length > 0) {
+            container.appendChild(createSectionHeader('Errors'));
+            const errDiv = document.createElement('div');
+            errDiv.style.color = 'var(--status-error)';
+            errDiv.innerHTML = data.errors.map(e => `<p>${e}</p>`).join('');
+            container.appendChild(errDiv);
+        }
+        return;
+    }
 
     // 2. Document Summary / Intent
     if (data.intent) {

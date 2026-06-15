@@ -58,3 +58,6 @@ class WorkflowState(TypedDict):
 
     llm_provider: str | None
     """Optional LLM provider override for this workflow run."""
+
+    api_key: str | None
+    """Optional API key override from the frontend for demo purposes."""

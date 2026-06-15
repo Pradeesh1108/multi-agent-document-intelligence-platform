@@ -9,6 +9,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 
 from src.core.llm_factory import LLMFactory
 from src.core.logging import get_logger
+from src.core.utils import clean_llm_error
 from src.schemas.agent_outputs import (
     ComplaintEntities,
     ExtractedEntities,
@@ -61,6 +62,7 @@ class ExtractionAgent:
         intent: str,
         file_type: str,
         llm_provider: str | None = None,
+        api_key: str | None = None,
     ) -> dict:
         """
         Extract entities from document content.
@@ -81,7 +83,7 @@ class ExtractionAgent:
         schema_name = schema_class.__name__
 
         try:
-            llm = LLMFactory.create(provider=llm_provider, temperature=0.1)
+            llm = LLMFactory.create(provider=llm_provider, api_key=api_key, temperature=0.1)
             structured_llm = llm.with_structured_output(schema_class)
 
             messages = [
@@ -109,9 +111,10 @@ class ExtractionAgent:
             ).model_dump()
 
         except Exception as e:
+            clean_err = clean_llm_error(e)
             logger.error(f"[ExtractionAgent] Extraction failed: {e}")
             return ExtractedEntities(
                 entity_type=intent,
-                entities={"error": str(e), "raw_content_preview": normalized_content[:500]},
+                entities={"error": clean_err, "raw_content_preview": normalized_content[:500]},
                 confidence=0.0,
             ).model_dump()

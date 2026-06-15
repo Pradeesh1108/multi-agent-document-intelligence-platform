@@ -9,6 +9,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 
 from src.core.llm_factory import LLMFactory
 from src.core.logging import get_logger
+from src.core.utils import clean_llm_error
 from src.schemas.agent_outputs import IntentClassification
 
 logger = get_logger(__name__)
@@ -47,6 +48,7 @@ class IntentAgent:
         normalized_content: str,
         file_type: str,
         llm_provider: str | None = None,
+        api_key: str | None = None,
     ) -> dict:
         """
         Classify the intent of the document.
@@ -62,7 +64,7 @@ class IntentAgent:
         logger.info(f"[IntentAgent] Classifying intent (type: {file_type})")
 
         try:
-            llm = LLMFactory.create(provider=llm_provider, temperature=0.1)
+            llm = LLMFactory.create(provider=llm_provider, api_key=api_key, temperature=0.1)
             structured_llm = llm.with_structured_output(IntentClassification)
 
             messages = [
@@ -83,10 +85,11 @@ class IntentAgent:
             return result.model_dump()
 
         except Exception as e:
+            clean_err = clean_llm_error(e)
             logger.error(f"[IntentAgent] Classification failed: {e}")
             # Return a safe fallback
             return IntentClassification(
                 intent="other",
                 confidence=0.0,
-                reasoning=f"Classification failed: {e}",
+                reasoning=clean_err,
             ).model_dump()
