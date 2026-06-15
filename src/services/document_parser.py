@@ -114,10 +114,11 @@ def extract_pdf_text(pdf_path: str) -> str:
             if text.strip():
                 text_parts.append(text)
 
+        num_pages = len(doc)
         doc.close()
 
         full_text = "\n".join(text_parts)
-        logger.info(f"Extracted {len(full_text)} chars from {len(doc)} pages")
+        logger.info(f"Extracted {len(full_text)} chars from {num_pages} pages")
         return full_text
 
     except Exception as e:

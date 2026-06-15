@@ -112,11 +112,11 @@ class ActionAgent:
 
         # Create CRM ticket
         ticket_result = create_ticket.invoke({
-            "title": entities.get("issue_summary", entities.get("summary", f"Escalation: {document_id}")),
+            "title": entities.get("issue_summary") or entities.get("summary") or f"Escalation: {document_id}",
             "description": json.dumps(entities, default=str),
             "priority": priority,
-            "customer_name": entities.get("customer_name", "Unknown"),
-            "customer_email": entities.get("customer_email", ""),
+            "customer_name": entities.get("customer_name") or "Unknown",
+            "customer_email": entities.get("customer_email") or "",
             "category": intent_type,
         })
         actions.append(self._make_result("crm_ticket_created", "success", ticket_result))
@@ -138,11 +138,11 @@ class ActionAgent:
     ) -> list[dict]:
         """Handle support ticket creation."""
         ticket_result = create_ticket.invoke({
-            "title": entities.get("issue_summary", entities.get("summary", f"Support: {document_id}")),
+            "title": entities.get("issue_summary") or entities.get("summary") or f"Support: {document_id}",
             "description": json.dumps(entities, default=str),
             "priority": priority,
-            "customer_name": entities.get("customer_name", "Unknown"),
-            "customer_email": entities.get("customer_email", ""),
+            "customer_name": entities.get("customer_name") or "Unknown",
+            "customer_email": entities.get("customer_email") or "",
             "category": "technical",
         })
         return [self._make_result("support_ticket_created", "success", ticket_result)]
@@ -173,7 +173,7 @@ class ActionAgent:
             "title": f"Fraud Investigation: {document_id}",
             "description": f"Risk Score: {risk_info.get('risk_score', 'N/A')}",
             "priority": "critical",
-            "customer_name": entities.get("customer_name", "Unknown"),
+            "customer_name": entities.get("customer_name") or "Unknown",
             "category": "security",
         })
         actions.append(self._make_result("fraud_ticket_created", "success", ticket_result))
@@ -233,7 +233,7 @@ class ActionAgent:
     def _handle_rfq_response(self, entities: dict, document_id: str) -> list[dict]:
         """Handle RFQ response generation."""
         notif_result = send_notification.invoke({
-            "to": entities.get("requester_email", "sales@company.com"),
+            "to": entities.get("requester_email") or "sales@company.com",
             "subject": f"RE: Request for Quotation - {document_id}",
             "body": (
                 f"Thank you for your quotation request.\n"

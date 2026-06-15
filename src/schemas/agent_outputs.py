@@ -90,7 +90,7 @@ class PDFEntities(BaseModel):
     )
     regulatory_keywords: list[str] = Field(
         default_factory=list,
-        description="Regulatory keywords found (e.g., GDPR, HIPAA, SOX)",
+        description="Regulatory keywords found (e.g., GDPR, HIPAA, SOX). If none, return an empty array.",
     )
 
 

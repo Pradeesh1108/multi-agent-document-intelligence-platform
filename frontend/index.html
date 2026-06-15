@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Multi-Agent Document Intelligence & CRM Automation Platform — Process business documents with AI-powered agents using LangGraph and RAG.">
-    <title>Document Intelligence Platform</title>
+    <meta name="description" content="AI Workflow Simulator & Monitoring Dashboard for document intelligence.">
+    <title>Workflow Simulator & Monitoring Dashboard</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
 </head>
 <body>
 
@@ -14,92 +13,80 @@
 
     <!-- ── Header ─────────────────────────────────────────── -->
     <header class="app-header">
-        <h1>Document Intelligence Platform</h1>
+        <h1>Workflow Simulator & Monitoring Dashboard</h1>
         <p class="subtitle">
-            Process business documents through a multi-agent AI pipeline.
-            Supports emails, PDFs, and JSON with intelligent intent classification,
-            entity extraction, risk analysis, and automated action execution.
+            <strong>Purpose:</strong> This dashboard simulates document workflow execution. In production, workflows are typically triggered through APIs, webhooks, email ingestion, or external systems.
         </p>
-        <div class="header-badge">
-            <span class="dot"></span>
-            Multi-Agent • LangGraph • RAG
-        </div>
     </header>
 
     <!-- ── Input Section ──────────────────────────────────── -->
-    <section class="glass-card input-section">
-        <h2><span class="icon">📤</span> Submit Document</h2>
-
-        <!-- Tabs -->
-        <div class="input-tabs">
-            <button class="tab-button active" data-tab="upload" id="tab-btn-upload">📁 Upload File</button>
-            <button class="tab-button" data-tab="text" id="tab-btn-text">✏️ Paste Text</button>
+    <section class="glass-card">
+        <div class="card-header">
+            <h2>Upload Document</h2>
         </div>
-
-        <!-- Tab: Upload -->
-        <div class="tab-content active" id="tab-upload">
-            <div class="drop-zone" id="dropZone">
-                <span class="upload-icon">📄</span>
-                <p class="upload-text">Drag & drop a file here, or click to browse</p>
-                <p class="upload-hint">Supports: PDF, JSON, TXT, EML</p>
-                <input type="file" accept=".pdf,.json,.txt,.eml" id="fileInput">
+        
+        <div class="card-body">
+            <!-- Tabs -->
+            <div class="input-tabs">
+                <button class="tab-button active" data-tab="upload" id="tab-btn-upload">Upload File</button>
+                <button class="tab-button" data-tab="text" id="tab-btn-text">Paste Text</button>
             </div>
-            <div id="filePreview"></div>
-        </div>
 
-        <!-- Tab: Paste Text -->
-        <div class="tab-content" id="tab-text">
-            <div class="form-group">
-                <label for="textInput">Document Content</label>
-                <textarea
-                    id="textInput"
-                    placeholder="Paste an email body, JSON payload, or document text here...
+            <!-- Tab: Upload -->
+            <div class="tab-content active" id="tab-upload">
+                <div class="drop-zone" id="dropZone">
+                    <p class="upload-text">Click to select or drag and drop</p>
+                    <p class="upload-hint">Supported formats: PDF, JSON, TXT, EML</p>
+                    <input type="file" accept=".pdf,.json,.txt,.eml" id="fileInput">
+                </div>
+                <div id="filePreview"></div>
+            </div>
 
-Example email:
-From: alice@example.com
-Subject: URGENT: Service outage on account #12345
+            <!-- Tab: Paste Text -->
+            <div class="tab-content" id="tab-text">
+                <div class="form-group">
+                    <label for="textInput">Document Content</label>
+                    <textarea
+                        id="textInput"
+                        placeholder="Paste email body, JSON payload, or raw text..."
+                    ></textarea>
+                </div>
+            </div>
 
-Dear Support,
-Our production system has been down for 3 hours. This is causing significant revenue loss. Please escalate immediately.
-
-Best regards,
-Alice Johnson"
-                ></textarea>
+            <!-- Provider Select & Submit -->
+            <div class="provider-row flex-between">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label for="providerSelect">LLM Provider:</label>
+                    <select id="providerSelect">
+                        <option value="">Default (from env)</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="groq">Groq (LLaMA)</option>
+                    </select>
+                </div>
+                
+                <button class="submit-btn" id="submitBtn">
+                    Process Document
+                </button>
             </div>
         </div>
-
-        <!-- Provider Select -->
-        <div class="provider-row">
-            <label for="providerSelect">LLM Provider</label>
-            <select id="providerSelect">
-                <option value="">Default (from .env)</option>
-                <option value="gemini">Google Gemini</option>
-                <option value="groq">Groq (LLaMA)</option>
-            </select>
-        </div>
-
-        <!-- Submit -->
-        <button class="submit-btn" id="submitBtn">
-            🚀 Process Document
-        </button>
     </section>
 
     <!-- ── Results Section ────────────────────────────────── -->
     <section class="results-section hidden" id="resultsSection">
-        <div class="glass-card">
-            <h2><span class="icon">📊</span> Workflow Results</h2>
-
-            <!-- Pipeline Visualization -->
-            <div class="pipeline-visual" id="pipelineVisual"></div>
-
-            <!-- Results Content -->
-            <div id="resultsContent">
-                <div class="empty-state">
-                    <div class="empty-icon">🔍</div>
-                    <p>Submit a document to see processing results here.</p>
+        
+        <div class="result-card">
+            <div class="card-header">
+                <h2>Processing Results</h2>
+            </div>
+            <div class="card-body">
+                <div id="resultsContent">
+                    <div class="empty-state">
+                        Loading results...
+                    </div>
                 </div>
             </div>
         </div>
+
     </section>
 
 </div>

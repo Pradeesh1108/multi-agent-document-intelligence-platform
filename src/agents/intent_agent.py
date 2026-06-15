@@ -22,7 +22,7 @@ Available intents:
 - "invoice": Invoices, bills, payment requests, financial documents
 - "rfq": Requests for quotation, pricing inquiries, procurement requests
 - "compliance": Regulatory documents, policy documents, compliance-related content
-- "fraud_risk": Suspicious activities, fraud indicators, security threats
+- "fraud_risk": Suspicious activities, fraud indicators (e.g., unexpected bank account changes, urgent wire transfers), security threats
 - "support_request": Technical support requests, help requests, bug reports
 - "general_inquiry": General questions, information requests, follow-ups
 - "other": Content that doesn't clearly fit any category above

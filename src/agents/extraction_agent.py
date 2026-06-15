@@ -40,6 +40,7 @@ Extract all relevant fields based on the document's intent. Be thorough but accu
 Guidelines:
 - Extract only information that is explicitly stated or strongly implied in the document
 - Use null/None for fields that cannot be determined from the content
+- For list/array fields, if empty, return an empty array [], never [null]
 - For monetary amounts, extract the numeric value only
 - For dates, use the format as found in the document
 - Provide a brief, accurate summary when required

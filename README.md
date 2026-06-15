@@ -1,232 +1,133 @@
-== 🧠 Multi-Agent Document Intelligence & CRM Automation Platform ==
+<div align="center">
+  <h1>🚀 Multi-Agent Document Workflow Orchestration System</h1>
+  <p>An enterprise-grade AI automation engine that processes incoming business documents and routes them through autonomous decision pipelines.</p>
 
-A production-grade **Agentic AI** platform that intelligently processes business documents (emails, PDFs, JSON) through a pipeline of 7 specialized AI agents. Built with **LangGraph**, **LangChain**, **FastAPI**, and **ChromaDB** RAG.
+  <!-- Tech Stack Badges -->
+  <p>
+    <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+    <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
+    <img src="https://img.shields.io/badge/LangGraph-000000?style=for-the-badge&logo=python&logoColor=white" alt="LangGraph" />
+    <img src="https://img.shields.io/badge/ChromaDB-1D2939?style=for-the-badge&logo=database&logoColor=white" alt="ChromaDB" />
+    <img src="https://img.shields.io/badge/Groq-F55036?style=for-the-badge&logo=groq&logoColor=white" alt="Groq" />
+  </p>
+</div>
 
 ---
 
-== Architecture ==
+## 📖 The Vision: Beyond a Web Dashboard
 
-```mermaid
-flowchart TD
-    A["📤 Document Input<br/>(Email / PDF / JSON)"] --> B["📥 Intake Agent<br/>Normalize & Validate"]
-    B --> C["🎯 Intent Agent<br/>Classify Business Intent"]
-    C --> D["🔍 Extraction Agent<br/>Extract Structured Entities"]
-    D --> E["📚 Knowledge Agent<br/>RAG Retrieval (ChromaDB)"]
-    E --> F["⚡ Risk Agent<br/>Analyze Risk Factors"]
-    F --> G["🧠 Decision Agent<br/>Make Workflow Decision"]
-    G --> H["🚀 Action Agent<br/>Execute Business Actions"]
-    H --> I["📊 Results<br/>Structured Response"]
+Many AI projects treat the website as the product. **This project does not.**
 
-    style A fill:#7c3aed,color:#fff
-    style B fill:#1e1e3e,color:#f1f5f9,stroke:#7c3aed
-    style C fill:#1e1e3e,color:#f1f5f9,stroke:#7c3aed
-    style D fill:#1e1e3e,color:#f1f5f9,stroke:#7c3aed
-    style E fill:#1e1e3e,color:#f1f5f9,stroke:#3b82f6
-    style F fill:#1e1e3e,color:#f1f5f9,stroke:#ef4444
-    style G fill:#1e1e3e,color:#f1f5f9,stroke:#7c3aed
-    style H fill:#1e1e3e,color:#f1f5f9,stroke:#10b981
-    style I fill:#10b981,color:#fff
+In the real world, no employee sits at a dashboard to manually upload PDFs and wait for a progress bar. Instead, documents arrive continuously via email, API calls, or ERP webhooks. 
+
+This project is a true **Backend Workflow Automation Engine**. 
+
+The included frontend is strictly a **Workflow Simulation Dashboard**—a tool designed for developers and operations teams to test, debug, and monitor how the AI orchestrates real-time data flows.
+
+### Real World Implementation Flow
+
+This engine is designed to sit invisibly in the background of an enterprise infrastructure:
+
+```text
+External System (Email / ERP / Webhook)
+      ↓
+POST /documents/process
+      ↓
+LangGraph Multi-Agent Workflow
+      ↓
+AI Extracts Data, Checks RAG, Assesses Risk
+      ↓
+Automated Decision Executed
+      ↓
+Ticket Created in CRM / Sales Team Notified
 ```
 
 ---
 
-== Agent Workflow ==
+## 🧠 System Architecture & Agent Flow
 
-| # | Agent | Purpose | Technology |
-|---|-------|---------|------------|
-| 1 | **Intake Agent** | Detect file type, validate, normalize content | Deterministic (no LLM) |
-| 2 | **Intent Agent** | Classify business intent with confidence | LLM + `with_structured_output()` |
-| 3 | **Extraction Agent** | Extract entities using intent-specific schemas | LLM + Pydantic schemas |
-| 4 | **Knowledge Agent** | Retrieve relevant business context via RAG | ChromaDB + LangChain |
-| 5 | **Risk Agent** | Analyze fraud, compliance, and risk factors | LLM + `with_structured_output()` |
-| 6 | **Decision Agent** | Make final workflow decision with reasoning | LLM + `with_structured_output()` |
-| 7 | **Action Agent** | Execute business actions via LangChain tools | LangChain Tools |
+The core of the system is a 7-node autonomous agent pipeline built on **LangGraph**. Each agent has a specific, isolated responsibility.
 
-= LLM Swapping =
+```mermaid
+flowchart TD
+    %% Nodes
+    In([Incoming Document])
+    Intake(Intake Agent)
+    Intent(Intent Agent)
+    Extract(Extraction Agent)
+    Knowledge(Knowledge Agent)
+    Risk(Risk Agent)
+    Decision(Decision Agent)
+    Action(Action Agent)
+    Out([Workflow Complete])
 
-The platform supports dynamic LLM provider switching:
+    %% Edge Connections
+    In --> Intake
+    Intake -- Clean/Normalize --> Intent
+    Intent -- Classify --> Extract
+    Extract -- Structured Schema --> Knowledge
+    Knowledge -- RAG Context --> Risk
+    Risk -- Risk Factors --> Decision
+    Decision -- Recommended Action --> Action
+    Action -- Execute via CRM/Email --> Out
+```
 
-    LLMFactory
-    ├── Gemini Provider (langchain-google-genai)
-    └── Groq Provider   (langchain-groq)
-
-Set via environment variable or per-request override:
-`LLM_PROVIDER=gemini  # or groq`
+### Agent Responsibilities
+1. **Intake Agent**: Cleans and normalizes incoming payloads (Email, PDF, JSON).
+2. **Intent Agent**: Classifies the document (e.g., RFQ, Complaint, Invoice, Fraud Risk).
+3. **Extraction Agent**: Dynamically selects a Pydantic schema based on intent and extracts strict, type-safe entities.
+4. **Knowledge Agent**: Contextualizes the document against corporate policies using ChromaDB.
+5. **Risk Agent**: Assigns a risk score and flags urgent or suspicious activities.
+6. **Decision Agent**: Determines the next best action based on the aggregate data.
+7. **Action Agent**: Interfaces with external tools (Mock CRM, Email Server) to execute the final decision.
 
 ---
 
-== Quick Start ==
+## 🚀 Setup & Installation
 
-= Prerequisites =
+This project uses `uv` for lightning-fast Python package management.
 
+### Prerequisites
 - Python 3.12+
-- [uv](https://docs.astral.sh/uv/) package manager
+- `uv` installed (`pip install uv` or `curl -LsSf https://astral.sh/uv/install.sh | sh`)
 
-= Setup =
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Pradeesh1108/multi-agent-document-intelligence-platform.git
+cd multi-agent-document-intelligence-platform
+```
 
-    # Clone and navigate
-    cd multi-agent-doc-intel
+### 2. Install Dependencies
+```bash
+uv sync
+```
 
-    # Copy environment config
-    cp .env.example .env
+### 3. Environment Variables
+Copy the example environment file and add your API keys:
+```bash
+cp .env.example .env
+```
+Edit `.env` to configure your active LLM provider (`gemini` or `groq`) and insert the respective API keys.
 
-    # Edit .env and add your API keys
-    # Required: GOOGLE_API_KEY (for Gemini) or GROQ_API_KEY (for Groq)
-
-    # Install dependencies
-    uv sync
-
-    # (Optional) Ingest knowledge base for RAG
-    uv run python -m src.rag.ingestion
-
-    # Start the server
-    uv run python src/main.py
-
-The app will be running at: **http://localhost:8000**
-- Frontend: http://localhost:8000
-- API Docs: http://localhost:8000/docs
-
-= Docker =
-
-    # Build
-    docker build -t doc-intel .
-
-    # Run
-    docker run -p 8000:8000 --env-file .env doc-intel
+### 4. Run the Engine
+```bash
+uv run python src/main.py
+```
+- **API Documentation**: `http://localhost:8000/docs`
+- **Workflow Simulator (Frontend)**: `http://localhost:8000`
 
 ---
 
-== Environment Variables ==
+## 👨‍💻 Author & Contributions
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `LLM_PROVIDER` | Active LLM provider (`gemini` or `groq`) | `gemini` |
-| `GOOGLE_API_KEY` | Google Gemini API key | (required for gemini) |
-| `GROQ_API_KEY` | Groq API key | (required for groq) |
-| `GEMINI_MODEL` | Gemini model name | `gemini-2.0-flash` |
-| `GROQ_MODEL` | Groq model name | `llama-3.3-70b-versatile` |
-| `LOG_LEVEL` | Logging level | `INFO` |
-| `UPLOAD_DIR` | Temporary upload directory | `./uploads` |
-| `CHROMA_PERSIST_DIR` | ChromaDB storage directory | `./chroma_db` |
+<div align="center">
+  <a href="https://github.com/Pradeesh1108">
+    <img src="https://github.com/Pradeesh1108.png" width="100px" style="border-radius: 50%;" alt="Pradeesh1108" />
+  </a>
+  <br>
+  <strong>Built by <a href="https://github.com/Pradeesh1108">Pradeesh1108</a></strong>
+</div>
 
----
+<br>
 
-== API Usage ==
-
-= Health Check =
-
-`curl http://localhost:8000/health`
-
-= Process a Document (Text Input) =
-
-    curl -X POST http://localhost:8000/documents/process \
-    -F 'raw_text_input=From: alice@example.com
-    Subject: URGENT: Service outage on account #12345
-
-    Dear Support,
-    Our production system has been down for 3 hours.
-    Please escalate immediately.
-
-    Best regards,
-    Alice Johnson'
-
-= Process a Document (File Upload) =
-
-    curl -X POST http://localhost:8000/documents/upload \
-    -F "file=@invoice.pdf"
-
-= Process with LLM Override =
-
-    curl -X POST http://localhost:8000/workflow/run \
-    -H "Content-Type: application/json" \
-    -d '{
-    "raw_text_input": "{\"transaction_id\": \"TXN-789\", \"amount_usd\": 250000, \"origin_country\": \"Nigeria\"}",
-    "llm_provider": "groq"
-    }'
-
-= Ingest Knowledge Base =
-
-    # Via API
-    curl -X POST http://localhost:8000/rag/ingest
-
-    # Via CLI
-    uv run python -m src.rag.ingestion
-
-= Check Workflow Status =
-
-`curl http://localhost:8000/workflow/status/{workflow_id}`
-
----
-
-== RAG Knowledge Base ==
-
-The `knowledge_base/` directory contains business documents for RAG:
-
-    knowledge_base/
-    ├── policies/
-    │   └── crm_escalation_policy.md
-    ├── regulations/
-    │   └── compliance_guidelines.md
-    └── examples/
-    └── fraud_detection_rules.md
-
-**To add your own knowledge:**
-1. Add `.md` or `.txt` files to any subdirectory
-2. Run ingestion: `uv run python -m src.rag.ingestion`
-3. Documents are chunked and stored in ChromaDB for semantic retrieval
-
----
-
-== Project Structure ==
-
-    multi-agent-doc-intel/
-    ├── src/
-    │   ├── main.py                 # FastAPI application entry point
-    │   ├── api/routes/             # API endpoint handlers
-    │   ├── core/                   # Config, logging, LLM factory
-    │   ├── graph/                  # LangGraph workflow (state, nodes, edges)
-    │   ├── agents/                 # 7 specialized agents
-    │   ├── rag/                    # RAG pipeline (ingestion, retrieval, vector store)
-    │   ├── tools/                  # LangChain tools (CRM, email, validation, risk)
-    │   ├── schemas/                # Pydantic models for all data structures
-    │   └── services/               # Document parser, workflow orchestration
-    ├── frontend/                   # Single-page web UI (HTML/CSS/JS)
-    ├── knowledge_base/             # RAG knowledge documents
-    ├── tests/                      # Test suite
-    ├── .env.example                # Environment template
-    ├── pyproject.toml              # Project config (uv)
-    ├── Dockerfile                  # Container build
-    └── README.md
-
----
-
-== Testing ==
-
-    # Run all tests
-    uv run pytest tests/ -v
-
-    # Run specific test file
-    uv run pytest tests/test_schemas.py -v
-    uv run pytest tests/test_llm_factory.py -v
-
----
-
-== Tech Stack ==
-
-| Layer | Technology |
-|-------|------------|
-| **Backend** | Python 3.12+, FastAPI |
-| **Orchestration** | LangGraph, LangChain |
-| **LLMs** | Google Gemini, Groq (LLaMA) |
-| **RAG** | ChromaDB, LangChain Retrieval |
-| **Schemas** | Pydantic v2 |
-| **PDF Processing** | PyMuPDF |
-| **Frontend** | HTML, CSS, Vanilla JavaScript |
-| **Package Manager** | uv |
-| **Container** | Docker |
-
----
-
-== License ==
-
-MIT
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/Pradeesh1108/multi-agent-document-intelligence-platform/issues) if you want to contribute to the orchestration engine.
