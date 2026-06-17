@@ -17,6 +17,7 @@ from src.graph.nodes import (
     knowledge_node,
     risk_node,
 )
+from src.graph.edges import should_continue_after_intake, should_skip_knowledge
 from src.graph.state import WorkflowState
 
 logger = get_logger(__name__)
@@ -42,11 +43,23 @@ def build_workflow() -> StateGraph:
     graph.add_node("decision", decision_node)
     graph.add_node("action", action_node)
 
-    # ── Define Edges (Linear Pipeline) ──────────────────────────
+    # ── Define Edges (Conditional Pipeline) ─────────────────────────
     graph.add_edge(START, "intake")
-    graph.add_edge("intake", "intent")
+    
+    graph.add_conditional_edges(
+        "intake",
+        should_continue_after_intake,
+        {"continue": "intent", "abort": END}
+    )
+    
     graph.add_edge("intent", "extraction")
-    graph.add_edge("extraction", "knowledge")
+    
+    graph.add_conditional_edges(
+        "extraction",
+        should_skip_knowledge,
+        {"retrieve": "knowledge", "skip": "risk"}
+    )
+    
     graph.add_edge("knowledge", "risk")
     graph.add_edge("risk", "decision")
     graph.add_edge("decision", "action")

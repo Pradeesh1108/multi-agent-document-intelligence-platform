@@ -35,5 +35,14 @@ def should_skip_knowledge(state: WorkflowState) -> str:
     Could be used to skip RAG for certain intents where
     knowledge retrieval adds no value.
     """
-    # Currently always retrieve — can be customized
+    intent = state.get("intent", {})
+    if isinstance(intent, dict):
+        intent_val = intent.get("intent", "other")
+    else:
+        intent_val = "other"
+    
+    if intent_val in ("other", "general_inquiry"):
+        logger.info(f"Skipping knowledge retrieval for intent: {intent_val}")
+        return "skip"
+        
     return "retrieve"
