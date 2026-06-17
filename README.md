@@ -48,27 +48,7 @@ Ticket Created in CRM / Sales Team Notified
 
 The core of the system is a 7-node autonomous agent pipeline built on **LangGraph**. Each agent has a specific, isolated responsibility.
 
-```mermaid
-graph TD;
-    __start__([Start])
-    intake(Intake Agent)
-    intent(Intent Agent)
-    extraction(Extraction Agent)
-    knowledge(Knowledge Agent)
-    risk(Risk Agent)
-    decision(Decision Agent)
-    action(Action Agent)
-    __end__([End])
-    
-    __start__ --> intake;
-    intake --> intent;
-    intent --> extraction;
-    extraction --> knowledge;
-    knowledge --> risk;
-    risk --> decision;
-    decision --> action;
-    action --> __end__;
-```
+![System Architecture](snaps/System%20Arch.png)
 
 ### Agent Responsibilities
 1. **Intake Agent**: Cleans and normalizes incoming payloads (Email, PDF, JSON).
